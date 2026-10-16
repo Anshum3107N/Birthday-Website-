@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Happy Birthday! 🎁</title>
+
+<!-- Google Fonts (they fall back to system fonts if offline) -->
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+/* =========================================================
+   1. COLOR PALETTE — change these to restyle the whole site
+   ========================================================= */
+:root {
+  --bg-1: #ffe3ec;      /* pastel pink   */
+  --bg-2: #e9ddff;      /* soft lavender */
+  --bg-3: #fff1c9;      /* warm cream-gold */
+  --pink: #ec5f9f;      /* gift box & accents */
+  --pink-dark: #c93d82;
+  --purple: #8a63d2;
+  --gold: #f2b93b;
+  --gold-light: #ffe28a;
+  --text: #4a3560;      /* deep plum text */
+
+  --font-display: 'Poppins', 'Segoe UI', sans-serif;   /* "HAPPY BIRTHDAY" */
+  --font-script: 'Pacifico', 'Brush Script MT', cursive; /* message & headings */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  min-height: 100vh;
+  font-family: var(--font-display);
+  color: var(--text);
+  background: linear-gradient(160deg, var(--bg-1), var(--bg-2) 55%, var(--bg-3));
+  background-attachment: fixed;
+  overflow: hidden;               /* locked until the gift is opened */
+}
+body.unlocked { overflow-y: auto; overflow-x: hidden; }
+
+/* Twinkling stars + balloons + confetti live in fixed background layers */
+#stars, #balloons { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+
+.star {
+  position: absolute; background: var(--gold); border-radius: 50%;
+  box-shadow: 0 0 8px 2px rgba(242,185,59,.6);
+  animation: twinkle var(--d, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+@keyframes twinkle { 0%,100% { opacity: .15; transform: scale(.7); } 50% { opacity: 1; transform: scale(1.2); } }
+
+/* =========================================================
+   2. LANDING PAGE — the gift box
+   ========================================================= */
+#intro {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.2rem;
+  transition: opacity 1s ease, transform 1s ease;
+}
+#intro.hide { opacity: 0; transform: scale(1.15); pointer-events: none; }
+
+.gift {
+  position: relative; width: 200px; height: 210px; cursor: pointer;
+  filter: drop-shadow(0 18px 22px rgba(138,99,210,.3));
+  animation: bounce 2s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
+}
+.gift:focus-visible { outline: 3px dashed var(--purple); outline-offset: 10px; border-radius: 16px; }
+@keyframes bounce { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-16px) rotate(-1.5deg); } }
+
+/* Box body */
+.box {
+  position: absolute; bottom: 0; left: 10px; width: 180px; height: 130px;
+  background: linear-gradient(135deg, #ff93b9, var(--pink-dark));
+  border-radius: 0 0 14px 14px;
+}
+/* Lid (the bow sits on it, so it flies off together) */
+.lid {
+  position: absolute; bottom: 124px; left: 0; width: 200px; height: 48px;
+  background: linear-gradient(135deg, #ffa5c6, var(--pink));
+  border-radius: 12px;
+  transform-origin: 15% 100%;
+  transition: transform 1s cubic-bezier(.5,-.3,.4,1), opacity 1s ease;
+}
+/* Gold ribbon down the middle of box & lid */
+.box::before, .lid::before {
+  content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 30px; transform: translateX(-50%);
+  background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
+}
+/* Bow: two loops + knot */
+.bow { position: absolute; left: 50%; top: -6px; width: 0; height: 0; }
+.bow i {
+  position: absolute; top: -40px; width: 62px; height: 46px;
+  border: 11px solid var(--gold); border-radius: 50% 50% 50% 50%;
+  background: transparent;
+}
+.bow i:nth-child(1) { left: -66px; transform: rotate(-22deg); }
+.bow i:nth-child(2) { left: 4px;   transform: rotate(22deg); }
+.bow b {
+  position: absolute; left: -15px; top: -22px; width: 30px; height: 30px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--gold-light), var(--gold));
+}
+
+.hint { font-family: var(--font-script); font-size: 1.35rem; color: var(--purple); animation: pulse 2s ease-in-out infinite; transition: opacity .4s; text-align: center; padding: 0 1rem; }
+@keyframes pulse { 0%,100% { opacity: .6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
+
+/* Opening: shake → lid flies off */
+.gift.shake { animation: shake .55s ease-in-out; }
+@keyframes shake {
+  0%,100% { transform: rotate(0); } 15% { transform: rotate(-7deg) scale(1.05); } 30% { transform: rotate(7deg) scale(1.08); }
+  45% { transform: rotate(-6deg) scale(1.1); } 60% { transform: rotate(6deg) scale(1.1); } 80% { transform: rotate(-3deg) scale(1.08); }
+}
+.gift.open { animation: none; transform: scale(1.06); transition: transform .5s ease; }
+.gift.open .lid { transform: translateY(-260px) rotate(-35deg); opacity: 0; }
+
+/* A soft golden flash on open */
+#flash { position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle, rgba(255,240,170,.95), rgba(255,255,255,0) 65%); transition: opacity .9s ease; }
+#flash.on { opacity: 1; transition: opacity .15s ease; }
+
+/* =========================================================
+   3. HAPPY BIRTHDAY REVEAL + MESSAGE
+   ========================================================= */
+#hero {
+  position: relative; z-index: 2; min-height: 100vh; min-height: 100dvh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 2rem 1.2rem 5rem;
+  opacity: 0; visibility: hidden; transition: opacity 1s ease;
+}
+#hero.show { opacity: 1; visibility: visible; }
+
+.title { display: flex; flex-direction: column; align-items: center; gap: .1em; line-height: 1.05;
+  font-weight: 800; font-size: clamp(2.5rem, 13vw, 6.5rem); letter-spacing: .04em; }
+.word { display: flex; justify-content: center; }
+.letter {
+  display: inline-block; opacity: 0;
+  /* Each letter gets its own hue (set in JS) → rainbow-ish pastel/gold gradient look */
+  background: linear-gradient(160deg, hsl(var(--h) 85% 62%), hsl(calc(var(--h) + 45) 90% 58%));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+  filter: drop-shadow(0 4px 6px rgba(138,99,210,.25));
+}
+#hero.show .letter {
+  animation: pop .8s cubic-bezier(.2,1.5,.4,1) both, float 3.5s ease-in-out 1.8s infinite;
+  animation-delay: calc(var(--i) * 80ms + 300ms), calc(var(--i) * 120ms + 2s);
+}
+@keyframes pop { from { opacity: 0; transform: translateY(60px) scale(.2) rotate(-14deg); } to { opacity: 1; transform: none; } }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+.message {
+  max-width: 34rem; margin-top: 2.2rem; padding: 1.6rem 1.8rem;
+  background: rgba(255,255,255,.55); border: 1px solid rgba(242,185,59,.55); border-radius: 22px;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 12px 40px rgba(138,99,210,.15);
+  font-family: var(--font-script); font-size: clamp(1.15rem, 4.4vw, 1.6rem); line-height: 1.7;
+  opacity: 0; transform: translateY(24px);
+}
+#hero.show .message { animation: rise-in 1.2s ease 2.2s forwards; }
+@keyframes rise-in { to { opacity: 1; transform: none; } }
+
+.scroll-btn {
+  position: absolute; bottom: 1.6rem; left: 50%; transform: translateX(-50%);
+  background: none; border: 0; cursor: pointer; font: inherit; font-size: 1rem; color: var(--purple);
+  opacity: 0; animation: none; padding: .6rem 1rem;
+}
+#hero.show .scroll-btn { animation: rise-in 1s ease 4s forwards, nudge 1.8s ease-in-out 5s infinite; }
+@keyframes nudge { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 8px); } }
+
+/* Balloons drifting upward */
+.balloon {
+  position: absolute; bottom: -140px; width: var(--s); height: calc(var(--s) * 1.25);
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.75), var(--c) 45%);
+  border-radius: 50% 50% 50% 50% / 58% 58% 42% 42%; opacity: .9;
+  animation: rise var(--t) linear var(--delay) infinite;
+}
+.balloon::after { content: ""; position: absolute; top: 100%; left: 50%; width: 1px; height: 70px; background: rgba(74,53,96,.35); }
+@keyframes rise {
+  0% { transform: translate(0, 0) rotate(-4deg); }
+  50% { transform: translate(24px, -60vh) rotate(4deg); }
+  100% { transform: translate(-12px, -125vh) rotate(-4deg); }
+}
+
+/* =========================================================
+   4. PHOTO GALLERY
+   ========================================================= */
+#gallery { position: relative; z-index: 2; padding: 4rem 1.2rem 5rem; max-width: 1100px; margin: 0 auto; }
+#gallery h2 { font-family: var(--font-script); font-weight: 400; text-align: center; color: var(--purple);
+  font-size: clamp(1.7rem, 6vw, 2.8rem); margin-bottom: 2.4rem; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.4rem; }
+.photo {
+  position: relative; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 18px;
+  border: 6px solid #fff; background: #fff;
+  box-shadow: 0 8px 24px rgba(138,99,210,.18);
+  opacity: 0; transform: translateY(30px);
+  transition: opacity .8s ease, transform .8s ease, box-shadow .4s ease;
+}
+.photo.visible { opacity: 1; transform: none; }
+.photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s ease; }
+.photo:hover { box-shadow: 0 16px 40px rgba(236,95,159,.35); }
+.photo:hover img { transform: scale(1.08); }
+.photo figcaption {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 1.4rem .9rem .8rem; color: #fff; font-size: .95rem;
+  background: linear-gradient(transparent, rgba(74,53,96,.7)); transform: translateY(100%); transition: transform .4s ease;
+}
+.photo:hover figcaption { transform: none; }
+@media (hover: none) { .photo figcaption { transform: none; } }   /* always show captions on touch screens */
+
+.footer { text-align: center; margin-top: 3rem; font-family: var(--font-script); color: var(--pink-dark); font-size: 1.3rem; }
+
+/* =========================================================
+   5. MUSIC BUTTON
+   ========================================================= */
+#music {
+  position: fixed; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 60;
+  width: 46px; height: 46px; border-radius: 50%; border: 0; cursor: pointer; font-size: 1.3rem;
+  background: rgba(255,255,255,.8); box-shadow: 0 4px 14px rgba(138,99,210,.3);
+  opacity: 0; pointer-events: none; transition: opacity .8s ease, transform .2s ease;
+}
+#music.show { opacity: 1; pointer-events: auto; }
+#music:hover { transform: scale(1.1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .gift, .hint, .star, .balloon, .letter, .scroll-btn { animation-duration: .01s !important; animation-iteration-count: 1 !important; }
+}
+</style>
+</head>
+
+<body>
+
+<div id="stars"></div>
+<div id="balloons"></div>
+<canvas id="confetti"></canvas>
+<div id="flash"></div>
+
+<!-- Background music: paste your song link in MUSIC_URL inside the script below -->
+<audio id="bgm" loop preload="none"></audio>
+<button id="music" aria-label="Play or pause music">🎵</button>
+
+<!-- ============ SCREEN 1: THE GIFT BOX ============ -->
+<section id="intro">
+  <div class="gift" id="gift" role="button" tabindex="0" aria-label="Open your gift">
+    <div class="box"></div>
+    <div class="lid"><div class="bow"><i></i><i></i><b></b></div></div>
+  </div>
+  <!-- ✏️ Edit the small text under the box here -->
+  <p class="hint" id="hint">Click to open your gift! 🎁</p>
+</section>
+
+<!-- ============ SCREEN 2: HAPPY BIRTHDAY + MESSAGE ============ -->
+<section id="hero">
+  <!-- Letters are built by JavaScript from TITLE_LINES (see script) -->
+  <h1 class="title" id="title" aria-label="Happy Birthday"></h1>
+
+  <!-- ✏️ Edit your heartfelt message here -->
+  <p class="message">
+    Dear Uncle, wishing you the most wonderful birthday filled with love, laughter, and joy! ❤️<br>
+    Thank you for every smile, every lesson, and every memory. You mean the world to us.
+  </p>
+
+  <button class="scroll-btn" id="scrollBtn">See our memories ↓</button>
+</section>
+
+<!-- ============ SCREEN 3: PHOTO GALLERY ============ -->
+<section id="gallery">
+  <!-- ✏️ Edit the gallery heading here -->
+  <h2>Our Beautiful Memories Together 📸</h2>
+  <div class="grid" id="grid"></div>
+  <p class="footer">With all my love 💛</p>
+</section>
+
+<script>
+/* =========================================================
+   CUSTOMIZE HERE
+   ========================================================= */
+
+// 🎵 Birthday tune: paste a direct link to an .mp3 file (leave "" for no music)
+//    e.g. "music/birthday.mp3" or "https://example.com/song.mp3"
+const MUSIC_URL = "";
+
+// 📝 The big title, one array item per line
+const TITLE_LINES = ["HAPPY", "BIRTHDAY"];
+
+// 📸 Your photos: replace each `src` with your image path/URL and edit the caption.
+//    Leave src as "" to show a pretty placeholder. Add or remove lines freely.
+const PHOTOS = [
+  { src: "", caption: "Our first adventure" },
+  { src: "", caption: "Family dinner night" },
+  { src: "", caption: "That unforgettable trip" },
+  { src: "", caption: "Laughing together" },
+  { src: "", caption: "Holiday memories" },
+  { src: "", caption: "Just us, being us" },
+];
+
+// 🎨 Confetti colors
+const CONFETTI_COLORS = ["#ec5f9f", "#8a63d2", "#f2b93b", "#ffe28a", "#7fd1ff", "#ff9a76", "#9be3a6"];
+
+/* =========================================================
+   CODE (you usually don't need to change anything below)
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const gift = $("gift"), intro = $("intro"), hero = $("hero"), hint = $("hint");
+const audio = $("bgm"), musicBtn = $("music");
+let opened = false;
+
+/* ---------- Twinkling stars ---------- */
+(function makeStars() {
+  const box = $("stars");
+  for (let i = 0; i < 45; i++) {
+    const s = document.createElement("div");
+    const size = 2 + Math.random() * 4;
+    s.className = "star";
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${size}px;height:${size}px;` +
+                      `--d:${2 + Math.random()*3}s;--delay:${Math.random()*3}s`;
+    box.appendChild(s);
+  }
+})();
+
+/* ---------- Title: build letters ---------- */
+(function makeTitle() {
+  let i = 0;
+  TITLE_LINES.forEach(line => {
+    const w = document.createElement("div");
+    w.className = "word";
+    [...line].forEach(ch => {
+      const l = document.createElement("span");
+      l.className = "letter";
+      l.textContent = ch;
+      l.style.setProperty("--i", i);
+      l.style.setProperty("--h", (320 + i * 22) % 360);   // pink → gold → purple sweep
+      w.appendChild(l); i++;
+    });
+    $("title").appendChild(w);
+  });
+})();
+
+/* ---------- Gallery ---------- */
+function placeholder(n) {
+  const hues = [[330, 270], [270, 40], [40, 330], [200, 280], [20, 320], [290, 50]][n % 6];
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='400' height='500'>
+    <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0' stop-color='hsl(${hues[0]},80%,88%)'/><stop offset='1' stop-color='hsl(${hues[1]},75%,84%)'/>
+    </linearGradient></defs>
+    <rect width='400' height='500' fill='url(#g)'/>
+    <text x='200' y='245' font-size='64' text-anchor='middle'>📷</text>
+    <text x='200' y='305' font-size='22' font-family='sans-serif' fill='#4a3560' text-anchor='middle'>Your photo ${n + 1}</text></svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+PHOTOS.forEach((p, n) => {
+  const f = document.createElement("figure");
+  f.className = "photo";
+  f.innerHTML = `<img alt="${p.caption}" loading="lazy" src="${p.src || placeholder(n)}"><figcaption>${p.caption}</figcaption>`;
+  $("grid").appendChild(f);
+});
+// Fade photos in as they scroll into view
+const io = new IntersectionObserver(entries => entries.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add("visible"); io.unobserve(e.target); }
+}), { threshold: .15 });
+document.querySelectorAll(".photo").forEach((el, i) => { el.style.transitionDelay = (i % 3) * 120 + "ms"; io.observe(el); });
+
+/* ---------- Confetti & sparkles (canvas) ---------- */
+const cv = $("confetti"), ctx = cv.getContext("2d");
+let parts = [], running = false;
+function resize() { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; }
+addEventListener("resize", resize); resize();
+
+function addParticle(x, y, burst) {
+  const a = Math.random() * Math.PI * 2, v = burst ? 4 + Math.random() * 13 : 0;
+  const shape = ["rect", "circle", "spark"][Math.floor(Math.random() * 3)];
+  parts.push({
+    x, y, vx: Math.cos(a) * v + (burst ? 0 : (Math.random() - .5) * 2), vy: Math.sin(a) * v - (burst ? 5 : 0),
+    g: .16 + Math.random() * .1, drag: .985, rot: Math.random() * 6, vr: (Math.random() - .5) * .4,
+    size: (shape === "spark" ? 7 : 6) + Math.random() * 7,
+    color: shape === "spark" ? "#ffe28a" : CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+    shape, life: 1, decay: .004 + Math.random() * .006
+  });
+}
+function burst(x, y, n = 160) { for (let i = 0; i < n; i++) addParticle(x, y, true); loop(); }
+function rain(ms) {                       // gentle confetti shower from the top
+  const end = performance.now() + ms;
+  (function tick() {
+    for (let i = 0; i < 3; i++) addParticle(Math.random() * innerWidth, -10, false);
+    if (performance.now() < end) setTimeout(tick, 60);
+  })(); loop();
+}
+function drawSpark(s) {                   // 4-point sparkle
+  ctx.beginPath();
+  for (let i = 0; i < 8; i++) { const r = i % 2 ? s * .25 : s, a = i * Math.PI / 4; ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
+  ctx.closePath(); ctx.fill();
+}
+function loop() {
+  if (running) return; running = true;
+  (function frame() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    parts = parts.filter(p => p.life > 0 && p.y < innerHeight + 40);
+    parts.forEach(p => {
+      p.vx *= p.drag; p.vy = p.vy * p.drag + p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life -= p.decay;
+      ctx.save(); ctx.scale(devicePixelRatio, devicePixelRatio);
+      ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.globalAlpha = Math.max(0, Math.min(1, p.life * 1.6)); ctx.fillStyle = p.color;
+      if (p.shape === "rect") ctx.fillRect(-p.size / 2, -p.size / 3, p.size, p.size * .6);
+      else if (p.shape === "circle") { ctx.beginPath(); ctx.arc(0, 0, p.size / 2.2, 0, 7); ctx.fill(); }
+      else drawSpark(p.size);
+      ctx.restore();
+    });
+    if (parts.length) requestAnimationFrame(frame); else { running = false; ctx.clearRect(0, 0, cv.width, cv.height); }
+  })();
+}
+
+/* ---------- Balloons ---------- */
+function makeBalloons() {
+  const box = $("balloons");
+  for (let i = 0; i < 12; i++) {
+    const b = document.createElement("div");
+    b.className = "balloon";
+    b.style.cssText = `left:${4 + Math.random() * 90}%;--s:${46 + Math.random() * 34}px;` +
+      `--c:${CONFETTI_COLORS[i % CONFETTI_COLORS.length]};--t:${11 + Math.random() * 8}s;--delay:${Math.random() * 6}s`;
+    box.appendChild(b);
+  }
+}
+
+/* ---------- Music ---------- */
+function setMusicIcon() { musicBtn.textContent = audio.paused ? "🔇" : "🎵"; }
+musicBtn.addEventListener("click", () => {
+  if (!MUSIC_URL) { alert("Add a music link in MUSIC_URL (in the script) to enable the birthday tune 🎶"); return; }
+  audio.paused ? audio.play().catch(() => {}) : audio.pause();
+});
+audio.addEventListener("play", setMusicIcon); audio.addEventListener("pause", setMusicIcon);
+
+/* ---------- The main flow ---------- */
+function openGift() {
+  if (opened) return; opened = true;
+  hint.style.opacity = 0;
+  gift.classList.add("shake");                       // 1) box shakes with excitement
+
+  setTimeout(() => {                                 // 2) lid pops, confetti bursts
+    gift.classList.remove("shake"); gift.classList.add("open");
+    const r = gift.getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top + r.height / 3, 170);
+    setTimeout(() => burst(r.left + r.width / 2, r.top + r.height / 3, 90), 250);
+    $("flash").classList.add("on"); setTimeout(() => $("flash").classList.remove("on"), 160);
+    if (MUSIC_URL) { audio.src = MUSIC_URL; audio.volume = .6; audio.play().catch(() => {}); }
+    musicBtn.classList.add("show"); setMusicIcon();
+  }, 560);
+
+  setTimeout(() => intro.classList.add("hide"), 1700);   // 3) gift scene fades away
+  setTimeout(() => {                                     // 4) HAPPY BIRTHDAY appears
+    hero.classList.add("show"); makeBalloons(); rain(4500);
+  }, 2100);
+  setTimeout(() => { intro.style.display = "none"; document.body.classList.add("unlocked"); }, 3000);
+
+  // 5) After the animation settles, gently glide down to the gallery (unless they already scrolled)
+  setTimeout(() => { if (scrollY < 40) $("gallery").scrollIntoView({ behavior: "smooth" }); }, 9500);
+}
+gift.addEventListener("click", openGift);
+gift.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openGift(); } });
+$("scrollBtn").addEventListener("click", () => $("gallery").scrollIntoView({ behavior: "smooth" }));
+</script>
+</body>
+</html>
