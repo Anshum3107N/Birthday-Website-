@@ -201,12 +201,6 @@ body.unlocked { overflow-y: auto; overflow-x: hidden; }
 .photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s ease; }
 .photo:hover { box-shadow: 0 16px 40px rgba(236,95,159,.35); }
 .photo:hover img { transform: scale(1.08); }
-.photo figcaption {
-  position: absolute; left: 0; right: 0; bottom: 0; padding: 1.4rem .9rem .8rem; color: #fff; font-size: .95rem;
-  background: linear-gradient(transparent, rgba(74,53,96,.7)); transform: translateY(100%); transition: transform .4s ease;
-}
-.photo:hover figcaption { transform: none; }
-@media (hover: none) { .photo figcaption { transform: none; } }   /* always show captions on touch screens */
 
 .footer { text-align: center; margin-top: 3rem; font-family: var(--font-script); color: var(--pink-dark); font-size: 1.3rem; }
 
@@ -283,8 +277,7 @@ const MUSIC_URL = "";
 // 📝 The big title, one array item per line
 const TITLE_LINES = ["HAPPY", "BIRTHDAY"];
 
-// 📸 Your photos: replace each `src` with your image path/URL and edit the caption.
-//    Leave src as "" to show a pretty placeholder. Add or remove lines freely.
+// 📸 Your photos: just add filenames. No captions.
 const PHOTOS = [
   { src: "photo1.jpg" },
   { src: "photo2.jpg" },
@@ -357,7 +350,7 @@ function placeholder(n) {
 PHOTOS.forEach((p, n) => {
   const f = document.createElement("figure");
   f.className = "photo";
-  f.innerHTML = `<img alt="${p.caption}" loading="lazy" src="${p.src || placeholder(n)}"><figcaption>${p.caption}</figcaption>`;
+  f.innerHTML = `<img alt="Memory ${n + 1}" loading="lazy" src="${p.src || placeholder(n)}">`;
   $("grid").appendChild(f);
 });
 // Fade photos in as they scroll into view
