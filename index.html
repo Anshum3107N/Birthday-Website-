@@ -6,49 +6,50 @@
 <title>Happy Birthday! 🎁</title>
 
 <!-- Google Fonts (they fall back to system fonts if offline) -->
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:wght@800&display=swap" rel="stylesheet">
 
 <style>
 /* =========================================================
    1. COLOR PALETTE — change these to restyle the whole site
    ========================================================= */
 :root {
-  --bg-1: #ffe3ec;      /* pastel pink   */
-  --bg-2: #e9ddff;      /* soft lavender */
-  --bg-3: #fff1c9;      /* warm cream-gold */
-  --pink: #ec5f9f;      /* gift box & accents */
-  --pink-dark: #c93d82;
-  --purple: #8a63d2;
-  --gold: #f2b93b;
-  --gold-light: #ffe28a;
-  --text: #4a3560;      /* deep plum text */
-
-  --font-display: 'Poppins', 'Segoe UI', sans-serif;   /* "HAPPY BIRTHDAY" */
-  --font-script: 'Pacifico', 'Brush Script MT', cursive; /* message & headings */
+  --bg-1: #ffe3ec; --bg-2: #e9ddff; --bg-3: #fff1c9;
+  --pink: #ec5f9f; --pink-dark: #c93d82; --purple: #8a63d2;
+  --gold: #f2b93b; --gold-light: #ffe28a; --text: #4a3560;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-script: 'Dancing Script', 'Brush Script MT', cursive;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-
+html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--pink) transparent; }
 body {
-  min-height: 100vh;
-  font-family: var(--font-display);
-  color: var(--text);
-  background: linear-gradient(160deg, var(--bg-1), var(--bg-2) 55%, var(--bg-3));
-  background-attachment: fixed;
+  min-height: 100vh; font-family: var(--font-display); color: var(--text); -webkit-font-smoothing: antialiased;
+  background: linear-gradient(160deg, var(--bg-1), var(--bg-2) 55%, var(--bg-3)); background-attachment: fixed;
   overflow: hidden;               /* locked until the gift is opened */
 }
 body.unlocked { overflow-y: auto; overflow-x: hidden; }
+button:focus-visible { outline: 3px solid var(--purple); outline-offset: 3px; }
 
-/* Twinkling stars + balloons + confetti live in fixed background layers */
+/* Soft drifting colour glow + fine paper grain behind everything */
+body::before {
+  content: ""; position: fixed; inset: -25%; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(40% 35% at 20% 25%, rgba(236,95,159,.24), transparent 70%),
+    radial-gradient(35% 40% at 80% 30%, rgba(138,99,210,.22), transparent 70%),
+    radial-gradient(45% 35% at 60% 85%, rgba(242,185,59,.26), transparent 70%);
+  animation: drift 26s ease-in-out infinite alternate;
+}
+@keyframes drift { to { transform: translate3d(4%, 3%, 0) rotate(6deg) scale(1.08); } }
+body::after {
+  content: ""; position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: .1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .2 0 0 0 0 .4 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
 #stars, #balloons { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
 #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
-
 .star {
-  position: absolute; background: var(--gold); border-radius: 50%;
-  box-shadow: 0 0 8px 2px rgba(242,185,59,.6);
-  animation: twinkle var(--d, 3s) ease-in-out infinite;
-  animation-delay: var(--delay, 0s);
+  position: absolute; background: #fff; border-radius: 50%;
+  box-shadow: 0 0 6px 2px rgba(242,185,59,.6);
+  animation: twinkle var(--d, 3s) ease-in-out infinite; animation-delay: var(--delay, 0s);
 }
 @keyframes twinkle { 0%,100% { opacity: .15; transform: scale(.7); } 50% { opacity: 1; transform: scale(1.2); } }
 
@@ -57,57 +58,68 @@ body.unlocked { overflow-y: auto; overflow-x: hidden; }
    ========================================================= */
 #intro {
   position: fixed; inset: 0; z-index: 10;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.2rem;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.6rem;
   transition: opacity 1s ease, transform 1s ease;
 }
 #intro.hide { opacity: 0; transform: scale(1.15); pointer-events: none; }
+/* Warm halo glowing behind the gift */
+#intro::before {
+  content: ""; position: absolute; left: 50%; top: 50%; width: min(88vw, 560px); aspect-ratio: 1; translate: -50% -56%;
+  border-radius: 50%; background: radial-gradient(circle, rgba(255,236,170,.85), rgba(255,200,225,.35) 45%, transparent 70%);
+  animation: halo 4s ease-in-out infinite;
+}
+@keyframes halo { 50% { scale: 1.12; opacity: .75; } }
 
 .gift {
   position: relative; width: 200px; height: 210px; cursor: pointer;
-  filter: drop-shadow(0 18px 22px rgba(138,99,210,.3));
-  animation: bounce 2s ease-in-out infinite;
-  -webkit-tap-highlight-color: transparent;
+  filter: drop-shadow(0 22px 20px rgba(138,60,140,.32));
+  animation: bounce 2s ease-in-out infinite; -webkit-tap-highlight-color: transparent;
 }
 .gift:focus-visible { outline: 3px dashed var(--purple); outline-offset: 10px; border-radius: 16px; }
 @keyframes bounce { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-16px) rotate(-1.5deg); } }
 
-/* Box body */
 .box {
-  position: absolute; bottom: 0; left: 10px; width: 180px; height: 130px;
-  background: linear-gradient(135deg, #ff93b9, var(--pink-dark));
-  border-radius: 0 0 14px 14px;
+  position: absolute; bottom: 0; left: 10px; width: 180px; height: 130px; border-radius: 0 0 16px 16px;
+  background: linear-gradient(90deg, rgba(90,20,70,.22), transparent 22%, transparent 78%, rgba(90,20,70,.26)),
+              linear-gradient(165deg, #ff9fc4, var(--pink) 45%, var(--pink-dark));
 }
-/* Lid (the bow sits on it, so it flies off together) */
+.box::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 16px; background: linear-gradient(rgba(90,20,70,.3), transparent); }
 .lid {
-  position: absolute; bottom: 124px; left: 0; width: 200px; height: 48px;
-  background: linear-gradient(135deg, #ffa5c6, var(--pink));
-  border-radius: 12px;
+  position: absolute; bottom: 124px; left: 0; width: 200px; height: 48px; border-radius: 12px;
+  background: linear-gradient(90deg, rgba(90,20,70,.18), transparent 20%, transparent 80%, rgba(90,20,70,.2)),
+              linear-gradient(170deg, #ffb4d0, var(--pink));
+  box-shadow: inset 0 2px 1px rgba(255,255,255,.55), 0 10px 12px -6px rgba(110,20,80,.45);
   transform-origin: 15% 100%;
   transition: transform 1s cubic-bezier(.5,-.3,.4,1), opacity 1s ease;
 }
-/* Gold ribbon down the middle of box & lid */
+/* Satin gold ribbon */
 .box::before, .lid::before {
   content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 30px; transform: translateX(-50%);
-  background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
+  background: linear-gradient(90deg, #d9941a, var(--gold-light) 40%, var(--gold) 62%, #d9941a);
 }
-/* Bow: two loops + knot */
 .bow { position: absolute; left: 50%; top: -6px; width: 0; height: 0; }
 .bow i {
-  position: absolute; top: -40px; width: 62px; height: 46px;
-  border: 11px solid var(--gold); border-radius: 50% 50% 50% 50%;
-  background: transparent;
+  position: absolute; top: -40px; width: 62px; height: 46px; border-radius: 50%;
+  border: 11px solid var(--gold); border-color: #f7cc5c var(--gold) #d9941a var(--gold-light);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.4), 0 4px 6px rgba(140,80,0,.3);
 }
 .bow i:nth-child(1) { left: -66px; transform: rotate(-22deg); }
 .bow i:nth-child(2) { left: 4px;   transform: rotate(22deg); }
 .bow b {
   position: absolute; left: -15px; top: -22px; width: 30px; height: 30px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, var(--gold-light), var(--gold));
+  background: radial-gradient(circle at 35% 30%, #fff3c4, var(--gold-light) 30%, var(--gold) 70%, #d9941a);
+  box-shadow: 0 3px 6px rgba(140,80,0,.35);
 }
 
-.hint { font-family: var(--font-script); font-size: 1.35rem; color: var(--purple); animation: pulse 2s ease-in-out infinite; transition: opacity .4s; text-align: center; padding: 0 1rem; }
-@keyframes pulse { 0%,100% { opacity: .6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
+.hint {
+  font-family: var(--font-script); font-weight: 700; font-size: 1.5rem; color: var(--purple); text-align: center;
+  padding: .45rem 1.6rem; max-width: calc(100vw - 2rem); border-radius: 999px;
+  background: rgba(255,255,255,.55); border: 1px solid rgba(242,185,59,.5);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 8px 24px -8px rgba(138,99,210,.35);
+  animation: pulse 2s ease-in-out infinite; transition: opacity .4s;
+}
+@keyframes pulse { 0%,100% { opacity: .65; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
 
-/* Opening: shake → lid flies off */
 .gift.shake { animation: shake .55s ease-in-out; }
 @keyframes shake {
   0%,100% { transform: rotate(0); } 15% { transform: rotate(-7deg) scale(1.05); } 30% { transform: rotate(7deg) scale(1.08); }
@@ -116,7 +128,6 @@ body.unlocked { overflow-y: auto; overflow-x: hidden; }
 .gift.open { animation: none; transform: scale(1.06); transition: transform .5s ease; }
 .gift.open .lid { transform: translateY(-260px) rotate(-35deg); opacity: 0; }
 
-/* A soft golden flash on open */
 #flash { position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: 0;
   background: radial-gradient(circle, rgba(255,240,170,.95), rgba(255,255,255,0) 65%); transition: opacity .9s ease; }
 #flash.on { opacity: 1; transition: opacity .15s ease; }
@@ -127,54 +138,71 @@ body.unlocked { overflow-y: auto; overflow-x: hidden; }
 #hero {
   position: relative; z-index: 2; min-height: 100vh; min-height: 100dvh;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; padding: 2rem 1.2rem 5rem;
+  text-align: center; padding: 2rem 1.2rem 5.5rem;
   opacity: 0; visibility: hidden; transition: opacity 1s ease;
 }
 #hero.show { opacity: 1; visibility: visible; }
 
-.title { display: flex; flex-direction: column; align-items: center; gap: .1em; line-height: 1.05;
-  font-weight: 800; font-size: clamp(2.5rem, 13vw, 6.5rem); letter-spacing: .04em; }
+.title { display: flex; flex-direction: column; align-items: center; gap: .04em; line-height: 1;
+  font-weight: 800; font-size: clamp(2.6rem, 13vw, 6.6rem); letter-spacing: .05em; }
+/* Gold hairline that draws itself under the title */
+.title::after { content: ""; width: min(55%, 240px); height: 2px; margin-top: 1.1rem; opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+#hero.show .title::after { animation: grow 1.2s ease 1.6s forwards; }
+@keyframes grow { from { opacity: 0; transform: scaleX(0); } to { opacity: 1; transform: none; } }
 .word { display: flex; justify-content: center; }
 .letter {
   display: inline-block; opacity: 0;
-  /* Each letter gets its own hue (set in JS) → rainbow-ish pastel/gold gradient look */
-  background: linear-gradient(160deg, hsl(var(--h) 85% 62%), hsl(calc(var(--h) + 45) 90% 58%));
+  /* Rose-gold → gold satin gradient; a soft shine travels across the letters in a wave */
+  background: linear-gradient(115deg, var(--pink-dark) 0%, var(--pink) 28%, var(--gold) 52%, var(--gold-light) 62%, var(--pink) 100%);
+  background-size: 260% 100%;
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
-  filter: drop-shadow(0 4px 6px rgba(138,99,210,.25));
+  filter: drop-shadow(0 3px 4px rgba(138,60,140,.25));
 }
 #hero.show .letter {
-  animation: pop .8s cubic-bezier(.2,1.5,.4,1) both, float 3.5s ease-in-out 1.8s infinite;
-  animation-delay: calc(var(--i) * 80ms + 300ms), calc(var(--i) * 120ms + 2s);
+  animation: pop .9s cubic-bezier(.2,1.4,.4,1) both, float 4s ease-in-out infinite, shine 5s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 80ms + 300ms), calc(var(--i) * 120ms + 2s), calc(var(--i) * 140ms + 1.5s);
 }
 @keyframes pop { from { opacity: 0; transform: translateY(60px) scale(.2) rotate(-14deg); } to { opacity: 1; transform: none; } }
 @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes shine { 0%,100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
 
+/* Message card: frosted glass with a thin gold inner frame, like a greeting card */
 .message {
-  max-width: 34rem; margin-top: 2.2rem; padding: 1.6rem 1.8rem;
-  background: rgba(255,255,255,.55); border: 1px solid rgba(242,185,59,.55); border-radius: 22px;
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 12px 40px rgba(138,99,210,.15);
-  font-family: var(--font-script); font-size: clamp(1.15rem, 4.4vw, 1.6rem); line-height: 1.7;
+  position: relative; max-width: 36rem; margin-top: 2.4rem; padding: 2.3rem 2rem 2.1rem; border-radius: 28px;
+  background: linear-gradient(160deg, rgba(255,255,255,.78), rgba(255,255,255,.45));
+  border: 1px solid rgba(255,255,255,.8);
+  backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow: 0 0 0 1px rgba(242,185,59,.4), 0 24px 50px -16px rgba(138,99,210,.35);
+  font-family: var(--font-script); font-weight: 600; font-size: clamp(1.3rem, 4.8vw, 1.8rem); line-height: 1.6;
   opacity: 0; transform: translateY(24px);
 }
+.message::before { content: ""; position: absolute; inset: 7px; border-radius: 21px; border: 1px solid rgba(242,185,59,.5); pointer-events: none; }
 #hero.show .message { animation: rise-in 1.2s ease 2.2s forwards; }
 @keyframes rise-in { to { opacity: 1; transform: none; } }
 
 .scroll-btn {
-  position: absolute; bottom: 1.6rem; left: 50%; transform: translateX(-50%);
-  background: none; border: 0; cursor: pointer; font: inherit; font-size: 1rem; color: var(--purple);
-  opacity: 0; animation: none; padding: .6rem 1rem;
+  position: absolute; bottom: max(1.6rem, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+  cursor: pointer; font-family: var(--font-script); font-weight: 700; font-size: 1.25rem; color: var(--purple);
+  padding: .45rem 1.4rem; border-radius: 999px; background: rgba(255,255,255,.55); border: 1px solid rgba(138,99,210,.3);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); opacity: 0; animation: none;
 }
 #hero.show .scroll-btn { animation: rise-in 1s ease 4s forwards, nudge 1.8s ease-in-out 5s infinite; }
 @keyframes nudge { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 8px); } }
 
-/* Balloons drifting upward */
+/* Glossy balloons with a knot, drifting upward; every third one is "far away" (softer) */
 .balloon {
-  position: absolute; bottom: -140px; width: var(--s); height: calc(var(--s) * 1.25);
-  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.75), var(--c) 45%);
-  border-radius: 50% 50% 50% 50% / 58% 58% 42% 42%; opacity: .9;
+  position: absolute; bottom: -140px; width: var(--s); height: calc(var(--s) * 1.25); opacity: .9;
+  border-radius: 50% 50% 50% 50% / 58% 58% 42% 42%;
+  background: var(--c);
+  background: radial-gradient(circle at 30% 24%, rgba(255,255,255,.95) 0 5%, rgba(255,255,255,0) 20%),
+              radial-gradient(circle at 38% 32%, color-mix(in srgb, var(--c), white 30%), var(--c) 55%, color-mix(in srgb, var(--c), black 22%));
+  box-shadow: inset -6px -8px 14px rgba(0,0,0,.08);
   animation: rise var(--t) linear var(--delay) infinite;
 }
+.balloon:nth-child(3n) { filter: blur(1.5px); opacity: .5; }
+.balloon::before { content: ""; position: absolute; top: calc(100% - 2px); left: 50%; width: 10px; height: 8px; transform: translateX(-50%);
+  background: var(--c); clip-path: polygon(50% 0, 100% 100%, 0 100%); filter: brightness(.85); }
 .balloon::after { content: ""; position: absolute; top: 100%; left: 50%; width: 1px; height: 70px; background: rgba(74,53,96,.35); }
 @keyframes rise {
   0% { transform: translate(0, 0) rotate(-4deg); }
@@ -186,38 +214,44 @@ body.unlocked { overflow-y: auto; overflow-x: hidden; }
    4. PHOTO GALLERY
    ========================================================= */
 #gallery { position: relative; z-index: 2; padding: 4rem 1.2rem 5rem; max-width: 1100px; margin: 0 auto; }
-#gallery h2 { font-family: var(--font-script); font-weight: 400; text-align: center; color: var(--purple);
-  font-size: clamp(1.7rem, 6vw, 2.8rem); margin-bottom: 2.4rem; }
+#gallery h2 { display: flex; align-items: center; justify-content: center; gap: 1rem; text-align: center;
+  font-family: var(--font-script); font-weight: 700; color: var(--purple);
+  font-size: clamp(1.9rem, 6.5vw, 3rem); margin-bottom: 2.6rem; }
+#gallery h2::before, #gallery h2::after { content: ""; flex: 0 1 90px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+#gallery h2::after { transform: scaleX(-1); }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.4rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.6rem; }
 .photo {
-  position: relative; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 18px;
-  border: 6px solid #fff; background: #fff;
-  box-shadow: 0 8px 24px rgba(138,99,210,.18);
+  position: relative; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 20px;
+  border: 8px solid #fff; background: #fff;
+  box-shadow: 0 0 0 1px rgba(242,185,59,.4), 0 2px 4px rgba(74,53,96,.06), 0 18px 34px -12px rgba(138,99,210,.35);
   opacity: 0; transform: translateY(30px);
   transition: opacity .8s ease, transform .8s ease, box-shadow .4s ease;
 }
 .photo.visible { opacity: 1; transform: none; }
-.photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s ease; }
-.photo:hover { box-shadow: 0 16px 40px rgba(236,95,159,.35); }
-.photo:hover img { transform: scale(1.08); }
+.photo::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 -70px 60px -50px rgba(74,53,96,.3); }
+.photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .8s cubic-bezier(.2,.7,.2,1); }
+.photo:hover { box-shadow: 0 0 0 1px rgba(242,185,59,.6), 0 22px 44px -12px rgba(236,95,159,.45); }
+.photo:hover img { transform: scale(1.06); }
 
-.footer { text-align: center; margin-top: 3rem; font-family: var(--font-script); color: var(--pink-dark); font-size: 1.3rem; }
+.footer { text-align: center; margin-top: 3.2rem; font-family: var(--font-script); font-weight: 700; color: var(--pink-dark); font-size: 1.7rem; }
+.footer::before { content: ""; display: block; width: 80px; height: 1px; margin: 0 auto 1.4rem; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
 
 /* =========================================================
    5. MUSIC BUTTON
    ========================================================= */
 #music {
   position: fixed; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 60;
-  width: 46px; height: 46px; border-radius: 50%; border: 0; cursor: pointer; font-size: 1.3rem;
-  background: rgba(255,255,255,.8); box-shadow: 0 4px 14px rgba(138,99,210,.3);
+  width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(242,185,59,.55); cursor: pointer; font-size: 1.25rem;
+  background: rgba(255,255,255,.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 6px 18px -4px rgba(138,99,210,.4);
   opacity: 0; pointer-events: none; transition: opacity .8s ease, transform .2s ease;
 }
 #music.show { opacity: 1; pointer-events: auto; }
 #music:hover { transform: scale(1.1); }
 
 @media (prefers-reduced-motion: reduce) {
-  .gift, .hint, .star, .balloon, .letter, .scroll-btn { animation-duration: .01s !important; animation-iteration-count: 1 !important; }
+  .gift, .hint, .star, .balloon, .letter, .scroll-btn, body::before, #intro::before { animation-duration: .01s !important; animation-iteration-count: 1 !important; }
 }
 </style>
 </head>
@@ -330,7 +364,7 @@ let opened = false;
       l.className = "letter";
       l.textContent = ch;
       l.style.setProperty("--i", i);
-      l.style.setProperty("--h", (320 + i * 22) % 360);   // pink → gold → purple sweep
+      l.style.setProperty("--h", (320 + i * 22) % 360);
       w.appendChild(l); i++;
     });
     $("title").appendChild(w);
